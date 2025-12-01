@@ -69,4 +69,5 @@ async function autoAcceptCollabs() {
 }
 
 // Kör auto-accept som standard
+saveSession();
 autoAcceptCollabs();
