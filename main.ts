@@ -101,5 +101,7 @@ if (count3 > 0) {
 }
 
 // Kör auto-accept som standard
-saveSession();
-autoAcceptCollabs();
+(async () => {
+    await saveSession();
+    await autoAcceptCollabs();
+})();
