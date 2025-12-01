@@ -9,7 +9,7 @@ async function testBotDetection() {
 
     // Launch browser with stealth
     const browser = await chromium.launch({
-        headless: false,
+        headless: true,
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
@@ -25,10 +25,10 @@ async function testBotDetection() {
 
     const page = await context.newPage();
 
-    try {
+    
         // Test with bot detection site
-        console.log('📍 Testing: https://bot.sannysoft.com/');
-        await page.goto('https://bot.sannysoft.com/', { waitUntil: 'load' });
+        console.log('📍 Testing: instagram');
+        await page.goto('https://www.instagram.com', { waitUntil: 'load' });
 
         // Get page title
         const title = await page.title();
@@ -36,58 +36,19 @@ async function testBotDetection() {
 
         // Log key page elements that indicate detection status
         console.log('\n🧪 Detection Test Results:');
-        try {
-            const results = await page.$$eval('table tr', rows => {
-                return rows
-                    .map(row => {
-                        const cells = row.querySelectorAll('td');
-                        if (cells.length !== 2 && cells.length !== 3) return null;
+        
+            await page.fill('input[name="username"]', 'sprrr22');
+    await page.fill('input[name="password"]', 'Kebab123');
+    await page.press('input[name="password"]', 'Enter');
 
-                        const name = cells[0]?.innerText?.trim();
-                        const result = cells[1]?.innerText?.trim();
-                        const className = cells[1]?.className;
+    console.log('Logga in manuellt om 2FA behövs...');
+    await page.waitForTimeout(20000);
+                        
+            
 
-                        return {
-                            name,
-                            result,
-                            status: className?.includes('passed') ? 'passed'
-                                : className?.includes('warn') ? 'warn'
-                                    : className?.includes('failed') ? 'failed'
-                                        : 'unknown'
-                        };
-                    })
-                    .filter(Boolean);
-            });
-
-            // Analyze and report
-            const failed = results.filter(r => r?.status === 'failed');
-            const warned = results.filter(r => r?.status === 'warn');
-            const passed = results.filter(r => r?.status === 'passed');
-
-            console.log(`\n✅ Passed: ${passed.length}`);
-            console.log(`⚠️  Warnings: ${warned.length}`);
-            console.log(`❌ Failed: ${failed.length}`);
-
-            if (failed.length > 0 || warned.length > 0) {
-                console.log('\n🧪 Problematic tests:\n');
-                [...failed, ...warned].forEach(r => {
-                    console.log(`  [${r?.status.toUpperCase()}] ${r?.name} → ${r?.result}`);
-                });
-            } else {
-                console.log('\n🎉 All tests passed with no issues!');
-            }
-        } catch (error) {
-            console.log('ℹ️  Could not extract detailed test results');
-        }
-
-        console.log('\n✅ Test completed successfully!');
-
-    } catch (error) {
-        console.error('❌ Test failed:', error);
-    } finally {
+            // Analyze 
         await browser.close();
-    }
-}
+    
 
 // Run the test
 testBotDetection().catch(console.error);
