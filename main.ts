@@ -1,13 +1,40 @@
 import { chromium } from 'playwright-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+import * as fs from 'fs';
 
-// Add stealth plugin - this uses the actual puppeteer stealth plugin!
 chromium.use(StealthPlugin());
 
-async function testBotDetection() {
-    console.log('🚀 Starting Playwright Stealth Test...\n');
+const USERNAME = process.env.INSTAGRAM_USER || 'DITT_ANVÄNDARNAMN';
+const PASSWORD = process.env.INSTAGRAM_PASS || 'DITT_LÖSENORD';
+const SESSION_FILE = 'instagram_session.json';
 
-    // Launch browser with stealth
+async function saveSession() {
+    const browser = await chromium.launch({ headless: false }); // UI för första login
+    const context = await browser.newContext();
+    const page = await context.newPage();
+
+    await page.goto('https://www.instagram.com');
+    await page.waitForTimeout(5000);
+
+    await page.fill('input[name="username"]', USERNAME);
+    await page.fill('input[name="password"]', PASSWORD);
+    await page.press('input[name="password"]', 'Enter');
+
+    console.log('Logga in manuellt om 2FA behövs...');
+    await page.waitForTimeout(20000);
+
+    await context.storageState({ path: SESSION_FILE });
+    console.log(`✅ Session sparad i ${SESSION_FILE}`);
+
+    await browser.close();
+}
+
+async function autoAcceptCollabs() {
+    if (!fs.existsSync(SESSION_FILE)) {
+        console.error('Ingen sparad session hittades. Kör saveSession() först.');
+        return;
+    }
+
     const browser = await chromium.launch({
         headless: true,
         args: [
@@ -18,37 +45,28 @@ async function testBotDetection() {
         ]
     });
 
-    const context = await browser.newContext({
-        userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        viewport: { width: 1366, height: 768 }
-    });
-
+    const context = await browser.newContext({ storageState: SESSION_FILE });
     const page = await context.newPage();
 
-    
-        // Test with bot detection site
-        console.log('📍 Testing: instagram');
-        await page.goto('https://www.instagram.com', { waitUntil: 'load' });
+    await page.goto('https://www.instagram.com/accounts/activity/');
+    await page.waitForTimeout(6000);
 
-        // Get page title
-        const title = await page.title();
-        console.log(`📄 Page title: ${title}`);
+    const acceptButtons = page.locator('//button[contains(text(),"Acceptera")]');
+    const count = await acceptButtons.count();
 
-        // Log key page elements that indicate detection status
-        console.log('\n🧪 Detection Test Results:');
-        
-            await page.fill('input[name="username"]', 'sprrr22');
-    await page.fill('input[name="password"]', 'Kebab123');
-    await page.press('input[name="password"]', 'Enter');
+    if (count > 0) {
+        console.log(`Hittade ${count} förfrågningar. Accepterar...`);
+        for (let i = 0; i < count; i++) {
+            await acceptButtons.nth(i).click();
+            await page.waitForTimeout(2000);
+        }
+        console.log('✅ Alla collab-förfrågningar accepterade.');
+    } else {
+        console.log('Inga collab-förfrågningar hittades.');
+    }
 
-    console.log('Logga in manuellt om 2FA behövs...');
-    await page.waitForTimeout(20000);
-                        
-            
+    await browser.close();
+}
 
-            // Analyze 
-        await browser.close();
-    
-
-// Run the test
-testBotDetection().catch(console.error);
+// Kör auto-accept som standard
+autoAcceptCollabs();
