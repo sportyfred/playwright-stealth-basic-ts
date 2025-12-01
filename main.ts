@@ -84,8 +84,7 @@ async function autoAcceptCollabs(): Promise<void> {
     await browser.close();
 }
 
-// ✅ Kör i rätt ordning
-(async () => {
-    await saveSession();
-    await autoAcceptCollabs();
-})();})();
+// ✅ Kör i rätt ordning (async () => {    await saveSession();
+   // await 
+autoAcceptCollabs();
+//})();})();
