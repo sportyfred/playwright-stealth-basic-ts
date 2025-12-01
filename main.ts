@@ -1,6 +1,6 @@
 import { chromium } from 'playwright-extra';
 import { BrowserContext } from 'playwright'; // Typen kommer från Playwrightimport * as fs from 'fs';
-
+import * as fs from 'fs';
 const USERNAME = ${{INSTAGRAM_USER}};
 const PASSWORD = ${{INSTAGRAM_PASSWORD}};
 const SESSION_FILE = 'instagram_session.json';
