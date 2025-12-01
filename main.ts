@@ -51,18 +51,44 @@ async function autoAcceptCollabs() {
     await page.goto('https://www.instagram.com/accounts/activity/');
     await page.waitForTimeout(6000);
 
-    const acceptButtons = page.locator('//button[contains(text(),"Acceptera")]');
+    const acceptButtons = page.locator('//span[contains(text(),"bjudit")]');
     const count = await acceptButtons.count();
 
     if (count > 0) {
         console.log(`Hittade ${count} förfrågningar. Accepterar...`);
-        for (let i = 0; i < count; i++) {
-            await acceptButtons.nth(i).click();
+        
+            await acceptButtons.nth(0).click();
             await page.waitForTimeout(2000);
-        }
-        console.log('✅ Alla collab-förfrågningar accepterade.');
+        
+        console.log('✅ Alla collab-förfrågningar klickade.');
     } else {
         console.log('Inga collab-förfrågningar hittades.');
+    }
+
+const acceptButtons2 = page.locator('//div[contains(text(),"Recensera")]');
+    const count2 = await acceptButtons2.count();
+if (count2 > 0) {
+        console.log(`Hittade ${count2} förfrågningar. Accepterar...`);
+        
+            await acceptButtons2.nth(0).click();
+            await page.waitForTimeout(2000);
+        
+        console.log('✅ Alla collab-förfrågningar recenserade.');
+    } else {
+        console.log('Inga recensera-förfrågningar hittades.');
+    }
+
+const acceptButtons3 = page.locator('//span[contains(text(),"Godkänn")]');
+    const count3 = await acceptButtons3.count();
+if (count3 > 0) {
+        console.log(`Hittade ${count3} förfrågningar. Accepterar...`);
+        
+            await acceptButtons3.nth(0).click();
+            await page.waitForTimeout(2000);
+        
+        console.log('✅ Alla collab-förfrågningar godkändes.');
+    } else {
+        console.log('Inga godkänn-förfrågningar hittades.');
     }
 
     await browser.close();
