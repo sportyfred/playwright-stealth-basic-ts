@@ -9,7 +9,13 @@ const PASSWORD = process.env.INSTAGRAM_PASS || 'Kebab123';
 const SESSION_FILE = 'instagram_session.json';
 
 async function saveSession() {
-    const browser = await chromium.launch({ headless: false }); // UI för första login
+    const browser = await chromium.launch({ headless: true,
+        args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-blink-features=AutomationControlled'
+        ] }); // UI för första login
     const context = await browser.newContext();
     const page = await context.newPage();
 
