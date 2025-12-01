@@ -4,8 +4,8 @@ import * as fs from 'fs';
 
 chromium.use(StealthPlugin());
 
-const USERNAME = process.env.INSTAGRAM_USER || 'DITT_ANVÄNDARNAMN';
-const PASSWORD = process.env.INSTAGRAM_PASS || 'DITT_LÖSENORD';
+const USERNAME = process.env.INSTAGRAM_USER || 'sprrr22';
+const PASSWORD = process.env.INSTAGRAM_PASS || 'Kebab123';
 const SESSION_FILE = 'instagram_session.json';
 
 async function saveSession() {
