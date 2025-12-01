@@ -1,5 +1,5 @@
-import { chromium, BrowserContext } from 'playwright-extra';
-import * as fs from 'fs';
+import { chromium } from 'playwright-extra';
+import { BrowserContext } from 'playwright'; // Typen kommer från Playwrightimport * as fs from 'fs';
 
 const USERNAME = process.env.INSTAGRAM_USER || 'sprrr22';
 const PASSWORD = process.env.INSTAGRAM_PASS || 'Kebab123';
