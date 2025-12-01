@@ -8,7 +8,8 @@ const USERNAME = process.env.INSTAGRAM_USER || 'sprrr22';
 const PASSWORD = process.env.INSTAGRAM_PASS || 'Kebab123';
 const SESSION_FILE = 'instagram_session.json';
 
-async function saveSession() {
+
+async function saveSession(): Promise<void> {
     const browser = await chromium.launch({
         headless: true,
         args: [
@@ -30,7 +31,7 @@ async function saveSession() {
     await page.press('input[name="password"]', 'Enter');
 
     console.log('Logga in manuellt om 2FA behövs...');
-    await page.waitForTimeout(20000); // Vänta på 2FA
+    await page.waitForTimeout(20000);
 
     await context.storageState({ path: SESSION_FILE });
     console.log(`✅ Session sparad i ${SESSION_FILE}`);
@@ -38,7 +39,7 @@ async function saveSession() {
     await browser.close();
 }
 
-async function autoAcceptCollabs() {
+async function autoAcceptCollabs(): Promise<void> {
     if (!fs.existsSync(SESSION_FILE)) {
         console.error('Ingen sparad session hittades. Kör saveSession() först.');
         return;
@@ -54,14 +55,14 @@ async function autoAcceptCollabs() {
         ]
     });
 
-    const context = await browser.newContext({ storageState: SESSION_FILE });
+    const context: BrowserContext = await browser.newContext({ storageState: SESSION_FILE });
     const page = await context.newPage();
 
     await page.goto('https://www.instagram.com/accounts/activity/', { waitUntil: 'networkidle' });
     await page.waitForTimeout(6000);
 
-    // Funktion för att klicka på alla knappar som matchar en locator
-    async function clickAll(locator) {
+    // Typa locator som string
+    async function clickAll(locator: string): Promise<void> {
         const buttons = page.locator(locator);
         const count = await buttons.count();
         if (count > 0) {
@@ -87,4 +88,4 @@ async function autoAcceptCollabs() {
 (async () => {
     await saveSession();
     await autoAcceptCollabs();
-})();
+})();})();
