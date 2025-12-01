@@ -1,12 +1,10 @@
-import { chromium } from 'playwright-extra';
-import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+import { chromium, BrowserContext } from 'playwright-extra';
 import * as fs from 'fs';
-
-chromium.use(StealthPlugin());
 
 const USERNAME = process.env.INSTAGRAM_USER || 'sprrr22';
 const PASSWORD = process.env.INSTAGRAM_PASS || 'Kebab123';
 const SESSION_FILE = 'instagram_session.json';
+
 
 
 async function saveSession(): Promise<void> {
@@ -20,8 +18,20 @@ async function saveSession(): Promise<void> {
         ]
     });
 
-    const context = await browser.newContext();
+    const context = await browser.newContext({
+        userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        viewport: { width: 1280, height: 800 },
+        locale: 'sv-SE'
+    });
+
     const page = await context.newPage();
+
+    // Stealth tweaks
+    await page.addInitScript(() => {
+        Object.defineProperty(navigator, 'webdriver', { get: () => false });
+        Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3] });
+        Object.defineProperty(navigator, 'languages', { get: () => ['sv-SE', 'en'] });
+    });
 
     await page.goto('https://www.instagram.com', { waitUntil: 'networkidle' });
     await page.waitForSelector('input[name="username"]');
@@ -55,20 +65,31 @@ async function autoAcceptCollabs(): Promise<void> {
         ]
     });
 
-    const context: BrowserContext = await browser.newContext({ storageState: SESSION_FILE });
+    const context: BrowserContext = await browser.newContext({
+        storageState: SESSION_FILE,
+        userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        viewport: { width: 1280, height: 800 },
+        locale: 'sv-SE'
+    });
+
     const page = await context.newPage();
+
+    await page.addInitScript(() => {
+        Object.defineProperty(navigator, 'webdriver', { get: () => false });
+        Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3] });
+        Object.defineProperty(navigator, 'languages', { get: () => ['sv-SE', 'en'] });
+    });
 
     await page.goto('https://www.instagram.com/accounts/activity/', { waitUntil: 'networkidle' });
     await page.waitForTimeout(6000);
 
-    // Typa locator som string
     async function clickAll(locator: string): Promise<void> {
         const buttons = page.locator(locator);
         const count = await buttons.count();
         if (count > 0) {
             console.log(`Hittade ${count} förfrågningar. Klickar...`);
             for (let i = 0; i < count; i++) {
-                await buttons.nth(0).click();
+                await buttons.nth(i).click();
                 await page.waitForTimeout(2000);
             }
             console.log('✅ Alla förfrågningar hanterade.');
@@ -84,8 +105,14 @@ async function autoAcceptCollabs(): Promise<void> {
     await browser.close();
 }
 
-// ✅ Kör i rätt ordning 
-(async () => {    await saveSession();
-   await 
-autoAcceptCollabs();
-})();})();
+// ✅ Kör i rätt ordning
+(async () => {
+    if (!fs.existsSync(SESSION_FILE)) {
+        console.log('Ingen session hittades. Skapar ny...');
+        await saveSession();
+    } else {
+        console.log('✅ Sparad session hittades. Hoppar över login.');
+    }
+
+    await autoAcceptCollabs();
+})();
