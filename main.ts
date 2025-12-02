@@ -33,7 +33,7 @@ async function saveSession(): Promise<void> {
         Object.defineProperty(navigator, 'languages', { get: () => ['sv-SE', 'en'] });
     });
 
-    await page.goto('https://www.instagram.com/accounts/activity/', { waitUntil: 'domcontentloaded' });
+    await page.goto('https://www.instagram.com', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('input[name="username"]');
 
 
@@ -81,7 +81,7 @@ async function autoAcceptCollabs(): Promise<void> {
         Object.defineProperty(navigator, 'languages', { get: () => ['sv-SE', 'en'] });
     });
 
-    await page.goto('https://www.instagram.com/accounts/activity/', { waitUntil: 'networkidle' });
+    await page.goto('https://www.instagram.com/accounts/activity/', { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(6000);
 await page.screenshot({ path: 'screenshots/debug.png', fullPage: true });
 console.log('✅ Screenshot saved at screenshots/debug.png');
