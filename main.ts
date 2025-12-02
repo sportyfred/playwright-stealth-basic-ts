@@ -40,6 +40,8 @@ async function saveSession(): Promise<void> {
     await page.fill('input[name="username"]', USERNAME);
     await page.fill('input[name="password"]', PASSWORD);
     await page.press('input[name="password"]', 'Enter');
+await page.screenshot({ path: 'screenshots/debug.png', fullPage: true });
+console.log('✅ Screenshot saved at screenshots/debug.png');
 
     console.log('Logga in manuellt om 2FA behövs...');
     await page.waitForTimeout(20000);
