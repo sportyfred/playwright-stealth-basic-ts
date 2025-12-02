@@ -33,7 +33,7 @@ async function saveSession(): Promise<void> {
         Object.defineProperty(navigator, 'languages', { get: () => ['sv-SE', 'en'] });
     });
 
-    await page.goto('https://www.instagram.com', { waitUntil: 'networkidle' });
+    await page.goto('https://www.instagram.com/accounts/activity/', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('input[name="username"]');
 
 
