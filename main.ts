@@ -56,7 +56,7 @@ async function autoAcceptCollabs(): Promise<void> {
     }
 
     const browser = await chromium.launch({
-        headless: true,
+        headless: false,
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
@@ -82,6 +82,8 @@ async function autoAcceptCollabs(): Promise<void> {
 
     await page.goto('https://www.instagram.com/accounts/activity/', { waitUntil: 'networkidle' });
     await page.waitForTimeout(6000);
+await page.screenshot({ path: 'screenshots/debug.png', fullPage: true });
+console.log('✅ Screenshot saved at screenshots/debug.png');
 
     async function clickAll(locator: string): Promise<void> {
         const buttons = page.locator(locator);
@@ -91,6 +93,8 @@ async function autoAcceptCollabs(): Promise<void> {
             for (let i = 0; i < count; i++) {
                 await buttons.nth(i).click();
                 await page.waitForTimeout(2000);
+await page.screenshot({ path: 'screenshots/debug.png', fullPage: true });
+console.log('✅ Screenshot saved at screenshots/debug.png');
             }
             console.log('✅ Alla förfrågningar hanterade.');
         } else {
