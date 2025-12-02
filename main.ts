@@ -9,7 +9,7 @@ const SESSION_FILE = 'instagram_session.json';
 
 async function saveSession(): Promise<void> {
     const browser = await chromium.launch({
-        headless: true,
+        headless: false,
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
@@ -36,13 +36,14 @@ async function saveSession(): Promise<void> {
     await page.goto('https://www.instagram.com', { waitUntil: 'networkidle' });
     await page.waitForSelector('input[name="username"]');
 
+
     await page.fill('input[name="username"]', USERNAME);
     await page.fill('input[name="password"]', PASSWORD);
     await page.press('input[name="password"]', 'Enter');
 
     console.log('Logga in manuellt om 2FA behövs...');
     await page.waitForTimeout(20000);
-
+await page.screenshot({ path: 'screenshots/activity-page.png', fullPage: true });
     await context.storageState({ path: SESSION_FILE });
     console.log(`✅ Session sparad i ${SESSION_FILE}`);
 
